@@ -7,6 +7,9 @@ var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
 var mongoose = require('mongoose');
 var session = require('express-session');
+var passport = require('passport');
+var flash = require('connect-flash');
+
 
 var index = require('./routes/index');
 
@@ -14,6 +17,7 @@ var index = require('./routes/index');
 var app = express();
 
 mongoose.connect('mongodb://localhost:27017/shop');
+require('./config/passport');
 let db = mongoose.connection;
 
 db.once('open', function(){
@@ -35,6 +39,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//passport middleware
+app.use(passport.initialize())
+app.use(passport.session());
+app.use(flash());
 
 //Session middleware
 app.use(session({
