@@ -9,10 +9,10 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var passport = require('passport');
 var flash = require('connect-flash');
-
+var validator = require('express-validator');
 
 var index = require('./routes/index');
-
+var userRoute = require('./routes/user');
 
 var app = express();
 
@@ -40,10 +40,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//passport middleware
-app.use(passport.initialize())
-app.use(passport.session());
-app.use(flash());
+//express validator middleware
+app.use(validator());
 
 //Session middleware
 app.use(session({
@@ -52,6 +50,18 @@ app.use(session({
   resave: false
 }));
 
+//passport middleware
+app.use(passport.initialize())
+app.use(passport.session());
+app.use(flash());
+
+//saving global variable login
+app.use(function(req, res, next){
+  res.locals.login = req.isAuthenticated();
+  next();
+});
+
+app.use('/user', userRoute);
 app.use('/', index);
 
 // catch 404 and forward to error handler
